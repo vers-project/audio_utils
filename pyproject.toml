@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "audio-utils"
+version = "0.1.0"
+requires-python = "==3.12.*"
+# torch is intentionally NOT listed here — the consuming project (e.g. NAC, VIC)
+# provides it via cpu/cu128 optional extras so hardware selection stays at the
+# project level.  torchaudio is listed as a direct dependency; the consuming
+# project's [tool.uv.sources] overrides the index for GPU builds.
+dependencies = [
+    "rotary-embedding-torch",
+    "pandas",
+    "numpy",
+    "soundfile",
+    "tqdm",
+    "experiment-launcher"
+]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[project.optional-dependencies]
+cpu = [
+  "torch",
+  "torchaudio",
+  "torchcodec",
+]
+cu128 = [
+  "torch",
+  "torchaudio",
+  "torchcodec"
+]
+
+[tool.uv]
+conflicts = [
+  [
+    { extra = "cpu" },
+    { extra = "cu128" },
+  ],
+]
+
+[tool.uv.sources]
+# By providing multiple options for the same package, uv will select 
+# the one that matches the index provided via the CLI.
+torch = [
+  { index = "pytorch-cu128", extra = "cu128"},
+  { index = "pytorch-cpu", extra = "cpu"},
+]
+# torchvision = [
+#   { index = "pytorch-cu128", extra = "cu128"},
+#   { index = "pytorch-cpu", extra = "cpu"},
+# ]
+torchaudio = [
+  { index = "pytorch-cu128", extra = "cu128"},
+  { index = "pytorch-cpu", extra = "cpu"},
+]
+# Always pull torchcodec from CPU index regardless of the global choice
+torchcodec = { index = "pytorch-cpu" }
+
+experiment-launcher = { git = "https://github.com/vers-project/slurm_launcher", tag = "v0.1.0" }
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.setuptools.packages.find]
+where   = ["."]
+include = ["audio_utils*"]

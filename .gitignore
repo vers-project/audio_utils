@@ -1,0 +1,8 @@
+.venv/
+uv.lock
+*.egg-info/
+__pycache__/
+*.pyc
+
+# Private working files: a separate git repository, never part of this one.
+private/
