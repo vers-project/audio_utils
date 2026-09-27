@@ -5,6 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "audio-utils"
 version = "0.1.0"
+license = { text = "MIT" }
 requires-python = "==3.12.*"
 # torch is intentionally NOT listed here — the consuming project (e.g. NAC, VIC)
 # provides it via cpu/cu128 optional extras so hardware selection stays at the
